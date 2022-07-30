@@ -20,3 +20,5 @@ docker-compose -f docker-compose.build.yaml build
 ### Run
 ```
 docker-compose -f docker-compose.dev.yaml up
+```
+
