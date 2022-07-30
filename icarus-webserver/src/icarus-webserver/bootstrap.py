@@ -6,6 +6,7 @@ from . import config
 from .adapters import (
     orm,
     mqtt_client as mqtt,
+    file_system_saver as fss,
 )
 
 from .service_layer import (
@@ -19,7 +20,8 @@ logging.basicConfig(level=logging.INFO)
 
 def bootstrap(
     start_orm: bool = True,
-    unit_of_work = uow.SqlAlchemyUnitOfWork()
+    unit_of_work = uow.SqlAlchemyUnitOfWork(),
+    saver = fss.FileSystemSaver()
     ):
 
     if start_orm:
@@ -28,7 +30,8 @@ def bootstrap(
     mqtt_client = None
 
     dependencies = {
-        "uow": unit_of_work
+        "uow": unit_of_work,
+        "saver": saver
         }
 
     injected_event_handlers = {

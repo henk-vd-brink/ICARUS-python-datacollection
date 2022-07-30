@@ -129,13 +129,14 @@ async def upload_image_file(
 ):
     try:
         bus.handle_message(
-            "StoreImage", 
+            "StoreImageOnFileSystem", 
             {
                 "image_bytes": file.file,
                 "file_name": file.filename
             }
         )
     except Exception as e:
+        logger.exception(e)
         return HTTPException(404, detail=str(e))
 
     response.headers.update({"Location": "/uploaded_images/" + file.filename})

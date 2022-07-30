@@ -38,32 +38,35 @@ def store_image_meta_data(cmd, uow):
 
         uow.commit()
 
-def store_image_on_file_system(cmd, uow):
+def store_image_on_file_system(cmd, uow, saver):
     image_bytes = cmd.image_bytes
     file_name = cmd.file_name
 
     image_uuid, _ = file_name.split(".")
 
+    store_image_meta_data(
+        cmd = commands.StoreImageMetaData(
+            file_name=file_name,
+            meta_data = [],
+        ),
+        uow = uow
+    )
+
+    saver.save(
+        file_name=file_name,
+        bytes = image_bytes
+    )
+
     with uow:
         image = uow.images.get(uuid=image_uuid)
 
-        if not image:
-            image = model.Image(
-                uuid = image_uuid,
-                file_name = file_name,
-                file_base_path = FILE_BASE_PATH,
-            )
-            uow.images.add(image)
-
-        file_path = FILE_BASE_PATH + "/" + file_name
-        image.file_path = file_path
-
-        with open("/usr/docker_user/data/" + file_name, "wb") as f:
-            f.write(image_bytes.read())
-
-        image.set_stored(stored=True)
+        if saver.file_exists(file_name):
+            image.set_stored(stored=True)
+        
         uow.commit()
         
+def log_event(event):
+    logger.info(event.asdict())
 
 COMMAND_HANDLERS = {
     commands.StoreImageOnFileSystem: store_image_on_file_system,
@@ -71,6 +74,6 @@ COMMAND_HANDLERS = {
 }
 
 EVENT_HANDLERS = {
-    events.StoredImage: [],
-    events.StoredImageMetaData: [],
+    events.StoredImageOnFileSystem: [log_event],
+    events.StoredImageMetaData: [log_event],
 }

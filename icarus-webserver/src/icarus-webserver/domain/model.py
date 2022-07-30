@@ -41,7 +41,7 @@ class Image:
             return
 
         self.events.append(
-            events.StoredImage(
+            events.StoredImageOnFileSystem(
                 file_path = self.file_path
             )
         )
