@@ -1,0 +1,9 @@
+fastapi
+uvicorn
+sqlalchemy
+psycopg2
+alembic
+paho-mqtt
+python-multipart
+pydantic
+schema

@@ -1,0 +1,22 @@
+version: "3.8"
+
+services:
+  icarus-webserver:
+    build:
+      context: icarus-webserver
+      dockerfile: Dockerfile
+    image: prominendt/icarus-webserver-dev:${DC_IMAGE_TAG}
+
+  icarus-storage:
+    build:
+      context: icarus-storage
+      dockerfile: Dockerfile
+    image: prominendt/icarus-storage-dev:${DC_IMAGE_TAG}
+
+  icarus-proxy:
+    build:
+      context: icarus-proxy
+      dockerfile: Dockerfile
+    image: prominendt/icarus-proxy-dev:${DC_IMAGE_TAG}
+
+
