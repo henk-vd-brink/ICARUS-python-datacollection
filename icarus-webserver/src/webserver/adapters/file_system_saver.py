@@ -3,17 +3,14 @@ import logging
 
 logger = logging.getLogger(__name__)
 
-class FileSystemSaver:
 
+class FileSystemSaver:
     def __init__(self):
         self.base_path = "/usr/docker_user/data/"
 
     def save(self, file_name, bytes):
         try:
-            self._save(
-                file_name=file_name,
-                bytes=bytes
-                )
+            self._save(file_name=file_name, bytes=bytes)
         except Exception as e:
             logger.info(str(e))
 

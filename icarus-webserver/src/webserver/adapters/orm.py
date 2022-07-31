@@ -28,7 +28,7 @@ images = Table(
     Column("file_path", String, nullable=True),
     Column("file_extension", String, nullable=True),
     Column("stored", Boolean, nullable=True),
-    Column("time_stamp", String, nullable=False)
+    Column("time_stamp", String, nullable=False),
 )
 
 image_meta_data = Table(
@@ -43,6 +43,7 @@ image_meta_data = Table(
     Column("h", Integer, nullable=True),
 )
 
+
 def start_mappers():
     image_meta_data_mapper = mapper(model.ImageMetaData, image_meta_data)
 
@@ -50,12 +51,10 @@ def start_mappers():
         model.Image,
         images,
         properties={
-            "_meta_data": relationship(
-                image_meta_data_mapper,
-                collection_class = set
-            ),
-        }
+            "_meta_data": relationship(image_meta_data_mapper, collection_class=set),
+        },
     )
+
 
 @event.listens_for(model.Image, "load")
 def receive_load(image, _):

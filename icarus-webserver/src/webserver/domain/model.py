@@ -4,13 +4,7 @@ from . import events
 
 
 class Image:
-    def __init__(
-        self,
-        uuid,
-        file_name,
-        file_base_path,
-        meta_data=set()
-    ):
+    def __init__(self, uuid, file_name, file_base_path, meta_data=set()):
         self.uuid = uuid
         self.file_name = file_name
         self.file_path = self._get_file_path(file_base_path, file_name)
@@ -40,25 +34,20 @@ class Image:
         if not stored:
             return
 
-        self.events.append(
-            events.StoredImageOnFileSystem(
-                file_path = self.file_path
-            )
-        )
+        self.events.append(events.StoredImageOnFileSystem(file_path=self.file_path))
 
     def asdict(self):
         return dict(
-            uuid = self.uuid,
-            file_name = self.file_name,
-            file_path = self.file_path,
-            file_extension = self.file_extension,
-            stored = self.stored,
-            time_stamp = self.time_stamp,
-            meta_data = [
-                asdict(m) for m in self._meta_data
-            ]
+            uuid=self.uuid,
+            file_name=self.file_name,
+            file_path=self.file_path,
+            file_extension=self.file_extension,
+            stored=self.stored,
+            time_stamp=self.time_stamp,
+            meta_data=[asdict(m) for m in self._meta_data],
         )
-        
+
+
 @dataclass(unsafe_hash=True)
 class ImageMetaData:
     image_uuid: str

@@ -5,13 +5,15 @@ import logging
 import dataclasses
 import paho.mqtt.client as paho
 
+
 @dataclasses.dataclass
 class MqttConfig:
     broker_ip_address: str
     broker_publish_topic: str
     broker_port: int = 1883
     broker_subscribe_topics: list = dataclasses.field(default_factory=list)
-        
+
+
 class MqttClient(paho.Client):
     def __init__(
         self,
