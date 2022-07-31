@@ -50,15 +50,8 @@ class SqlAlchemyUnitOfWork(AbstractUnitOfWork):
 
     def __enter__(self):
         self.session = self.session_factory()  # type: Session
+        self.images = repository.ImageSqlAlchemyRepository(self.session)
         return super().__enter__()
-
-    @property
-    def images(self):
-        return repository.ImageSqlAlchemyRepository(self.session)
-
-    @property
-    def transactions(self):
-        return repository.TransactionSqlAlchemyRepository(self.session)
 
     def __exit__(self, *args):
         super().__exit__(*args)
