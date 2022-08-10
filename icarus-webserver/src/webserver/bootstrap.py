@@ -17,7 +17,7 @@ logging.basicConfig(level=logging.INFO)
 def bootstrap(
     start_orm: bool = True,
     unit_of_work=uow.SqlAlchemyUnitOfWork(),
-    saver=fss.FileSystemSaver(),
+    saver=fss.FileSystemSaver(base_path="/usr/docker_user/data"),
 ):
 
     if start_orm:

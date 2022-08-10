@@ -14,10 +14,19 @@ def command_factory(name, **fields):
     return cls
 
 
-StoreImageOnFileSystem = command_factory(
-    "StoreImageOnFileSystem", image_bytes=tempfile.SpooledTemporaryFile, file_name=str
+CreateImage = command_factory("CreateImage", image_uuid=str, meta_data=list)
+
+AddMetaDataToImage = command_factory(
+    "AddMetaDataToImage",
+    image_uuid=str,
+    label=str,
+    bx=float,
+    by=float,
+    w=float,
+    h=float,
 )
 
-StoreImageMetaData = command_factory(
-    "StoreImageMetaData", file_name=str, meta_data=list
+
+StoreImage = command_factory(
+    "StoreImage", image_bytes=tempfile.SpooledTemporaryFile, file_name=str
 )

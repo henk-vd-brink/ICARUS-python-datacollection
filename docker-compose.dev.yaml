@@ -2,29 +2,27 @@ version: "3.8"
 
 services:
   icarus-webserver:
-    image: prominendt/icarus-webserver-dev:${DC_IMAGE_TAG}
+    image: prominendt/icarus-dev:amd64-demo-webserver-dev
     container_name: icarus-webserver
-    entrypoint: ["./scripts/start.fastapi.sh"]
+    entrypoint: [ "./scripts/start.fastapi.sh" ]
     ports:
       - 8000:8000
     environment:
       - DB_USER_PASSWORD=postgres
       - DB_IP_ADDRESS=icarus-storage
       - HOST_MOUNT_PATH=/usr/docker_user/data
-    # volumes:
-    #   - /home/prominendt/data:/usr/docker_user/data
     depends_on:
       - icarus-storage
-      
+
   icarus-storage:
-    image: prominendt/icarus-storage-dev:${DC_IMAGE_TAG}
+    image: prominendt/icarus-dev:amd64-demo-storage
     container_name: icarus-storage
     environment:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
 
   icarus-proxy:
-    image: prominendt/icarus-proxy-dev:${DC_IMAGE_TAG}
+    image: prominendt/icarus-dev:amd64-demo-proxy
     container_name: icarus-proxy
     ports:
       - 5000:80
@@ -41,5 +39,3 @@ services:
       PGADMIN_DEFAULT_EMAIL: pgadmin4@pgadmin.org
       PGADMIN_DEFAULT_PASSWORD: admin
     restart: unless-stopped
-
-

@@ -19,10 +19,19 @@ class Image:
         return "time_stamp"
 
     def _get_file_path(self, file_base_path, file_name):
-        return file_base_path + "/" + file_name
+        if file_base_path and file_name:
+            return file_base_path + "/" + file_name
+        return ""
+
+    def set_file_information(self, file_base_path, file_name, file_extension):
+        self.file_name = file_name
+        self.file_path = self._get_file_path(file_base_path, file_name)
+        self.file_extension = file_extension
 
     def _get_file_extension(self, file_name):
-        return file_name.split(".")[-1]
+        if file_name:
+            return file_name.split(".")[-1]
+        return ""
 
     @property
     def meta_data(self):
@@ -52,7 +61,7 @@ class Image:
 class ImageMetaData:
     image_uuid: str
     label: str
-    bx: int
-    by: int
-    w: int
-    h: int
+    bx: float
+    by: float
+    w: float
+    h: float

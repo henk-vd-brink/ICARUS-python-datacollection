@@ -33,10 +33,10 @@ async def get_all_images(
             "content": {
                 "application/json": {
                     "schema": {
-                        "required": ["file_name", "meta_data"],
+                        "required": ["image_uuid", "meta_data"],
                         "type": "object",
                         "properties": {
-                            "file_name": {"type": "string"},
+                            "image_uuid": {"type": "string"},
                             "meta_data": {
                                 "type": "array",
                                 "items": {
@@ -66,7 +66,7 @@ async def create_image(
 
     try:
         bus.handle_message(
-            "StoreImageMetaData",
+            "CreateImage",
             request_json,
         )
     except schema.SchemaError as e:
@@ -86,30 +86,63 @@ async def get_image_meta_data_by_uuid(request: Request, response: Response, uuid
     return JSONResponse(content=result)
 
 
-@app.get("/uploaded_images/{file_path}", status_code=200)
-def get_image_file(request: Request, response: Response, file_path: str):
+@app.post(
+    "/images/{uuid}/metadata",
+    openapi_extra={
+        "requestBody": {
+            "content": {
+                "application/json": {
+                    "schema": {
+                        "required": ["label", "bx", "by", "w", "h"],
+                        "type": "object",
+                        "properties": {
+                            "label": {"type": "string"},
+                            "bx": {"type": "number"},
+                            "by": {"type": "number"},
+                            "w": {"type": "number"},
+                            "h": {"type": "number"},
+                        },
+                    }
+                }
+            },
+            "required": True,
+        },
+    },
+)
+async def add_metadata_to_image(request: Request, response: Response, uuid: str):
+    request_json = await request.json()
+    request_json.update({"image_uuid": uuid})
+
+    try:
+        bus.handle_message(
+            "AddMetaDataToImage",
+            request_json,
+        )
+    except schema.SchemaError as e:
+        return HTTPException(404, detail=str(e))
+
+    response.status_code = 201
+    return response
+
+
+@app.get("/files/{file_name}", status_code=200)
+def get_image_file(request: Request, response: Response, file_name: str):
     base_file_path = "/usr/docker_user/data/"
-    absolute_file_path = base_file_path + file_path
-
-    _file_name = absolute_file_path.split("/")[-1]
-    file_extension = _file_name.split(".")[-1]
-
-    if file_extension not in ["png", "jpg", "jpeg"]:
-        return HTTPException(404, detail="Invalid request")
+    absolute_file_path = base_file_path + file_name
 
     if not os.path.exists(absolute_file_path):
         return HTTPException(404, detail="Requested resource does not exist")
 
-    return FileResponse(base_file_path + file_path)
+    return FileResponse(base_file_path + file_name)
 
 
-@app.post("/uploaded_images", status_code=204)
+@app.post("/files", status_code=204)
 async def upload_image_file(
     request: Request, response: Response, file: UploadFile = None
 ):
     try:
         bus.handle_message(
-            "StoreImageOnFileSystem",
+            "StoreImage",
             {"image_bytes": file.file, "file_name": file.filename},
         )
     except Exception as e:
