@@ -21,8 +21,6 @@ def bootstrap(
     if start_orm:
         orm.start_mappers()
 
-    mqtt_client = None
-
     dependencies = {"uow": unit_of_work}
 
     injected_event_handlers = {
@@ -43,7 +41,7 @@ def bootstrap(
             event_handlers=injected_event_handlers,
             uow=unit_of_work,
         ),
-        mqtt_client=mqtt_client,
+        mqtt_client=None,
     )
 
 

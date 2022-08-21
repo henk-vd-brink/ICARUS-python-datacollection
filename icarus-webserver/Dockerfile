@@ -1,13 +1,13 @@
 FROM python:3.8.0-slim-buster
 
-ENV HOME=/usr/docker_user
+ENV HOME=/home/docker_user
 
 RUN apt-get update \
     && apt-get install -y \
-        libpq-dev \
-        gcc \
-        curl \
-        iputils-ping
+    libpq-dev \
+    gcc \
+    curl \
+    iputils-ping
 
 WORKDIR ${HOME}
 
@@ -22,10 +22,9 @@ COPY src/ ${HOME}/src
 
 RUN mkdir ${HOME}/data
 
-# RUN useradd docker_user \
-# 	&& chown -R "docker_user:docker_user" ${HOME} \
-#     && chmod g+r ${HOME} \
-#     && mkdir ${HOME}/data && chmod 755 ${HOME}/data \
-RUN chmod 755 ${HOME}/scripts/*
+RUN useradd docker_user \
+    && chown -R "docker_user:docker_user" ${HOME} \
+    && chmod g+r ${HOME} \
+    RUN chmod 755 ${HOME}/scripts/*
 
-# USER docker_user
+USER docker_user

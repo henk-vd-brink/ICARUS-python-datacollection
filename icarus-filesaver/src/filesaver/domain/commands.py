@@ -1,3 +1,4 @@
+import tempfile
 from schema import Schema
 from dataclasses import make_dataclass
 
@@ -13,14 +14,6 @@ def command_factory(name, **fields):
     return cls
 
 
-CreateImage = command_factory("CreateImage", image_uuid=str, meta_data=list)
-
-AddMetaDataToImage = command_factory(
-    "AddMetaDataToImage",
-    image_uuid=str,
-    label=str,
-    bx=float,
-    by=float,
-    w=float,
-    h=float,
+StoreFile = command_factory(
+    "StoreFileOnFileSystem", file_bytes=tempfile.SpooledTemporaryFile, file_name=str
 )
