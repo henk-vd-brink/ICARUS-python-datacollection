@@ -123,30 +123,3 @@ async def add_metadata_to_image(request: Request, response: Response, uuid: str)
 
     response.status_code = 201
     return response
-
-
-@app.get("/files/{file_name}", status_code=200)
-def get_image_file(request: Request, response: Response, file_name: str):
-    base_file_path = "/usr/docker_user/data/"
-    absolute_file_path = base_file_path + file_name
-
-    if not os.path.exists(absolute_file_path):
-        return HTTPException(404, detail="Requested resource does not exist")
-
-    return FileResponse(base_file_path + file_name)
-
-
-@app.post("/files", status_code=204)
-async def upload_image_file(
-    request: Request, response: Response, file: UploadFile = None
-):
-    try:
-        bus.handle_message(
-            "StoreImage",
-            {"image_bytes": file.file, "file_name": file.filename},
-        )
-    except Exception as e:
-        logger.exception(e)
-        return HTTPException(404, detail=str(e))
-
-    response.headers.update({"Location": "/uploaded_images/" + file.filename})

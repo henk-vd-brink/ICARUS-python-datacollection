@@ -5,7 +5,7 @@ services:
     build:
       context: icarus-webserver
       dockerfile: Dockerfile
-    image: prominendt/icarus-dev:amd64-demo-webserver-dev
+    image: prominendt/icarus-dev:amd64-demo-webserver
 
   icarus-storage:
     build:

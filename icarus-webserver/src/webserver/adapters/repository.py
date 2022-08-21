@@ -1,15 +1,16 @@
 import abc
+import os
+import logging
+
 from ..domain import model
+
+logger = logging.getLogger(__name__)
 
 
 class AbstractRepository(abc.ABC):
     def __init__(self):
         self.session = None
         self.seen = set()
-
-    def add(self, obj):
-        self.session.add(obj)
-        self.seen.add(obj)
 
 
 class ImageSqlAlchemyRepository(AbstractRepository):
@@ -25,3 +26,7 @@ class ImageSqlAlchemyRepository(AbstractRepository):
 
     def get_all(self):
         return self.session.query(model.Image).all()
+
+    def add(self, obj):
+        self.session.add(obj)
+        self.seen.add(obj)

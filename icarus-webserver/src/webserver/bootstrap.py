@@ -6,7 +6,6 @@ from . import config
 from .adapters import (
     orm,
     mqtt_client as mqtt,
-    file_system_saver as fss,
 )
 
 from .service_layer import messagebus, handlers, unit_of_work as uow
@@ -17,7 +16,6 @@ logging.basicConfig(level=logging.INFO)
 def bootstrap(
     start_orm: bool = True,
     unit_of_work=uow.SqlAlchemyUnitOfWork(),
-    saver=fss.FileSystemSaver(base_path="/usr/docker_user/data"),
 ):
 
     if start_orm:
@@ -25,7 +23,7 @@ def bootstrap(
 
     mqtt_client = None
 
-    dependencies = {"uow": unit_of_work, "saver": saver}
+    dependencies = {"uow": unit_of_work}
 
     injected_event_handlers = {
         event_type: [

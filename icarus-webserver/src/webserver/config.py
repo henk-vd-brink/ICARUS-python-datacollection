@@ -11,7 +11,11 @@ def get_postgres_uri():
 
 
 def get_host_mount_path():
-    return os.environ.get("HOST_MOUNT_PATH", "/usr/docker_user/data")
+    return os.environ.get("HOST_MOUNT_PATH", "/home/docker_user/data")
+
+
+def get_container_base_path():
+    return "/home/docker_user/data"
 
 
 def get_mqtt_config():

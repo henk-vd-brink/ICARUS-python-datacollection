@@ -2,7 +2,7 @@ version: "3.8"
 
 services:
   icarus-webserver:
-    image: prominendt/icarus-dev:amd64-demo-webserver-dev
+    image: prominendt/icarus-dev:amd64-demo-webserver
     container_name: icarus-webserver
     entrypoint: [ "./scripts/start.fastapi.sh" ]
     ports:
