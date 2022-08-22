@@ -1,5 +1,4 @@
 import inspect
-import queue
 import logging
 from . import config
 
