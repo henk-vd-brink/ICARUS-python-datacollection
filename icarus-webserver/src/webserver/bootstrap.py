@@ -1,12 +1,9 @@
 import inspect
-import queue
+import os
 import logging
 from . import config
 
-from .adapters import (
-    orm,
-    mqtt_client as mqtt,
-)
+from .adapters import orm, rabbitmq_client as rbc
 
 from .service_layer import messagebus, handlers, unit_of_work as uow
 
@@ -16,6 +13,7 @@ logging.basicConfig(level=logging.INFO)
 def bootstrap(
     start_orm: bool = True,
     unit_of_work=uow.SqlAlchemyUnitOfWork(),
+    rabbitmq_client=rbc.RabbitmqClient(config=config.get_rabbitmq_config()),
 ):
 
     if start_orm:
@@ -41,7 +39,7 @@ def bootstrap(
             event_handlers=injected_event_handlers,
             uow=unit_of_work,
         ),
-        mqtt_client=None,
+        broker_client=rabbitmq_client,
     )
 
 

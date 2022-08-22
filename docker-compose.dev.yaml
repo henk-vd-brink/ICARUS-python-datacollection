@@ -1,6 +1,25 @@
 version: "3.8"
 
 services:
+  icarus-rabbitmqbroker:
+    image: prominendt/icarus-dev:amd64-demo-rabbitmqbroker
+    container_name: icarus-rabbitmqbroker
+    ports:
+      - 5672:5672
+      - 15672:15672
+      - 25672:25672
+    restart: always
+
+  icarus-webserver-rabbitmq:
+    image: prominendt/icarus-dev:amd64-demo-webserver
+    container_name: icarus-webserver-rabbitmq
+    entrypoint: [ "./scripts/start.rabbitmq.sh" ]
+    environment:
+      - DB_USER_PASSWORD=postgres
+      - DB_IP_ADDRESS=icarus-storage
+    depends_on:
+      - icarus-storage
+
   icarus-webserver:
     image: prominendt/icarus-dev:amd64-demo-webserver
     container_name: icarus-webserver
@@ -10,7 +29,17 @@ services:
     environment:
       - DB_USER_PASSWORD=postgres
       - DB_IP_ADDRESS=icarus-storage
-      - HOST_MOUNT_PATH=/usr/docker_user/data
+    depends_on:
+      - icarus-storage
+
+  icarus-filesaver:
+    image: prominendt/icarus-dev:amd64-demo-filesaver
+    container_name: icarus-filesaver
+    entrypoint: [ "./scripts/start.fastapi.sh" ]
+    ports:
+      - 7000:8000
+    environment:
+      - HOST_MOUNT_PATH=/home/docker_user/data
     depends_on:
       - icarus-storage
 

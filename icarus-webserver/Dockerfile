@@ -20,11 +20,9 @@ COPY scripts/ ${HOME}/scripts
 
 COPY src/ ${HOME}/src
 
-RUN mkdir ${HOME}/data
-
 RUN useradd docker_user \
     && chown -R "docker_user:docker_user" ${HOME} \
     && chmod g+r ${HOME} \
-    RUN chmod 755 ${HOME}/scripts/*
+    && chmod 755 ${HOME}/scripts/*
 
 USER docker_user

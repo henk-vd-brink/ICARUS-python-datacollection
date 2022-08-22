@@ -15,6 +15,8 @@ def command_factory(name, **fields):
 
 CreateImage = command_factory("CreateImage", image_uuid=str, meta_data=list)
 
+CreateImageFromStoreEvent = command_factory("CreateImageFromStoreEvent", file_name=str)
+
 AddMetaDataToImage = command_factory(
     "AddMetaDataToImage",
     image_uuid=str,

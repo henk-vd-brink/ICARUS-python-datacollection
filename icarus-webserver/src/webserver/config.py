@@ -1,5 +1,4 @@
 import os
-from .adapters import mqtt_client as mqtt
 
 
 def get_postgres_uri():
@@ -18,10 +17,7 @@ def get_container_base_path():
     return "/home/docker_user/data"
 
 
-def get_mqtt_config():
-    return mqtt.MqttConfig(
-        broker_ip_address=os.environ.get("MQTT_BROKER_IP_ADDRESS", "localhost"),
-        broker_port=1883,
-        broker_publish_topic=os.environ.get("MQTT_BROKER_PUBLISH_TOPIC", "/logs"),
-        broker_subscribe_topics=["/events"],
+def get_rabbitmq_config():
+    return dict(
+        broker_ip_address="icarus-rabbitmqbroker",
     )

@@ -27,21 +27,25 @@ class ParseIncomingRabbitMqMessage:
 
 
 @ParseIncomingRabbitMqMessage()
-def callback(ch, method, properties, parsed_message):
+def stored_image_on_file_system_callback(ch, method, properties, parsed_message):
     try:
-        bus.handle_message("AddSegmentToTransaction", parsed_message)
+        bus.handle_message("CreateImageFromStoreEvent", parsed_message)
     except Exception as e:
         logger.exception(str(e))
 
 
-with broker_client:
-    broker_client.connect()
-    broker_client.channel.queue_declare(queue="hello-world")
+CHANNEL_MAPPER = {"StoredImageOnFileSystem": stored_image_on_file_system_callback}
 
-    broker_client.channel.basic_consume(
-        queue="hello-world",
-        on_message_callback=callback,
-        auto_ack=True,
-    )
+
+if __name__ == "__main__":
+    broker_client.connect()
+
+    for channel, call_back in CHANNEL_MAPPER.items():
+        broker_client.channel.queue_declare(queue=channel)
+        broker_client.channel.basic_consume(
+            queue=channel,
+            on_message_callback=call_back,
+            auto_ack=True,
+        )
 
     broker_client.channel.start_consuming()

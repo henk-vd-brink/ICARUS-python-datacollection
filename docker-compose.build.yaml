@@ -1,11 +1,23 @@
 version: "3.8"
 
 services:
+  icarus-rabbitmqbroker:
+    build:
+      context: icarus-rabbitmqbroker
+      dockerfile: Dockerfile
+    image: prominendt/icarus-dev:amd64-demo-rabbitmqbroker
+
   icarus-webserver:
     build:
       context: icarus-webserver
       dockerfile: Dockerfile
     image: prominendt/icarus-dev:amd64-demo-webserver
+
+  icarus-filesaver:
+    build:
+      context: icarus-filesaver
+      dockerfile: Dockerfile
+    image: prominendt/icarus-dev:amd64-demo-filesaver
 
   icarus-storage:
     build:

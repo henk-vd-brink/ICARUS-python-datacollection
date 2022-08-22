@@ -1,4 +1,3 @@
-import os
 import logging
 import dataclasses
 
@@ -39,6 +38,11 @@ def create_image(cmd, uow):
         uow.commit()
 
 
+def create_image_from_store_event(cmd, uow):
+    image_uuid, _ = cmd.file_name.split(".")
+    create_image(cmd=commands.CreateImage(image_uuid=image_uuid, meta_data=[]), uow=uow)
+
+
 def add_meta_data_to_image(cmd, uow):
     image_uuid = cmd.image_uuid
 
@@ -73,6 +77,7 @@ def log_event(event):
 COMMAND_HANDLERS = {
     commands.CreateImage: create_image,
     commands.AddMetaDataToImage: add_meta_data_to_image,
+    commands.CreateImageFromStoreEvent: create_image_from_store_event,
 }
 
 EVENT_HANDLERS = {

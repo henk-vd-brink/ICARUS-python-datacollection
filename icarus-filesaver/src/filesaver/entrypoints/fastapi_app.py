@@ -15,11 +15,13 @@ async def upload_image_file(
     request: Request, response: Response, file: UploadFile = None
 ):
     try:
-        cmd = domain.commands.StoreFile(file_name=file.filename, file=file.file)
+        cmd = domain.commands.StoreFileOnFileSystem(
+            file_name=file.filename, file_bytes=file.file
+        )
 
-        handler = command_handlers[cmd]
+        handler = command_handlers[type(cmd)]
         handler(cmd)
-    except Exception:
-        pass
+    except Exception as e:
+        print(e)
 
     response.headers.update({"Location": "/uploaded_images/" + file.filename})

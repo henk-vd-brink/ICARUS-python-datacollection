@@ -3,15 +3,18 @@ import queue
 import logging
 from . import config
 
-from .adapters import file_system_saver as fss
+from .adapters import file_system_saver as fss, rabbitmq_client as rbc
 from .service_layer import handlers
 
 logging.basicConfig(level=logging.INFO)
 
 
-def bootstrap(file_system_saver=fss.FileSystemSaver()):
+def bootstrap(
+    file_system_saver=fss.FileSystemSaver(),
+    rabbitmq_client=rbc.RabbitmqClient(config=config.get_rabbitmq_config()),
+):
 
-    dependencies = {"saver": file_system_saver}
+    dependencies = {"saver": file_system_saver, "rabbitmq_client": rabbitmq_client}
 
     injected_command_handlers = {
         command_type: inject_dependencies(handler, dependencies)
