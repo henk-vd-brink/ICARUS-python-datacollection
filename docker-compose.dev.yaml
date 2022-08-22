@@ -41,7 +41,7 @@ services:
     environment:
       - HOST_MOUNT_PATH=/home/docker_user/data
     depends_on:
-      - icarus-storage
+      - icarus-rabbitmqbroker
 
   icarus-storage:
     image: prominendt/icarus-dev:amd64-demo-storage
