@@ -22,3 +22,9 @@ docker-compose -f docker-compose.build.yaml build
 docker-compose -f docker-compose.dev.yaml up
 ```
 
+### Run tests
+```
+make test_unit
+make test_integration
+```
+
