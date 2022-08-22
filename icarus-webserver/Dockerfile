@@ -19,6 +19,9 @@ COPY alembic/ ${HOME}/alembic
 COPY scripts/ ${HOME}/scripts
 
 COPY src/ ${HOME}/src
+COPY tests/ ${HOME}/tests
+
+RUN pip install -e ${HOME}/src
 
 RUN useradd docker_user \
     && chown -R "docker_user:docker_user" ${HOME} \

@@ -4,5 +4,15 @@ build_and_run:
 build_and_push:
 	. ./scripts/build_and_push.sh
 
-run_tests:
-	python3 -m 
+test_build:
+	docker-compose -f docker-compose.build.yaml build
+
+test_unit: test_build
+	docker-compose -f docker-compose.test.yaml run --entrypoint=pytest icarus-webserver /home/docker_user/tests/unit
+
+test_integration: test_build
+	docker-compose -f docker-compose.test.yaml run --entrypoint=pytest icarus-webserver /home/docker_user/tests/integration
+
+black:
+	python3 -m black icarus-webserver
+
