@@ -1,12 +1,10 @@
 import logging
-import os
 import schema
 
-from fastapi import FastAPI, Request, Response, HTTPException, UploadFile
+from fastapi import FastAPI, Request, Response, HTTPException
+from fastapi.responses import JSONResponse
 
-from fastapi.responses import JSONResponse, FileResponse
-
-from .. import domain, bootstrap, views
+from .. import bootstrap, views
 
 app = FastAPI()
 
@@ -17,7 +15,7 @@ bootstrap_items = bootstrap.bootstrap()
 bus = bootstrap_items.get("bus")
 
 
-@app.get("/images", status_code=200)
+@app.get("/images")
 async def get_all_images(
     request: Request,
     response: Response,
@@ -62,12 +60,12 @@ async def create_image(
     request: Request,
     response: Response,
 ):
-    request_json = await request.json()
+    request_dict = await request.json()
 
     try:
         bus.handle_message(
             "CreateImage",
-            request_json,
+            request_dict,
         )
     except schema.SchemaError as e:
         return HTTPException(404, detail=str(e))
@@ -76,7 +74,7 @@ async def create_image(
     return response
 
 
-@app.get("/images/{uuid}", status_code=200)
+@app.get("/images/{uuid}")
 async def get_image_meta_data_by_uuid(request: Request, response: Response, uuid: str):
     result = views.get_image_by_uuid(uuid=uuid, uow=bus.uow)
 
@@ -110,13 +108,13 @@ async def get_image_meta_data_by_uuid(request: Request, response: Response, uuid
     },
 )
 async def add_metadata_to_image(request: Request, response: Response, uuid: str):
-    request_json = await request.json()
-    request_json.update({"image_uuid": uuid})
+    request_dict = await request.json()
+    request_dict.update({"image_uuid": uuid})
 
     try:
         bus.handle_message(
             "AddMetaDataToImage",
-            request_json,
+            request_dict,
         )
     except schema.SchemaError as e:
         return HTTPException(404, detail=str(e))

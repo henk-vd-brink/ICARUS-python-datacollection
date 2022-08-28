@@ -39,8 +39,27 @@ def create_image(cmd, uow):
 
 
 def create_image_from_store_event(cmd, uow):
-    image_uuid, _ = cmd.file_name.split(".")
-    create_image(cmd=commands.CreateImage(image_uuid=image_uuid, meta_data=[]), uow=uow)
+    image_uuid, file_extension = cmd.file_name.split(".")
+
+    with uow:
+        image = uow.images.get(uuid=image_uuid)
+
+        if image is None:
+            image = model.Image(
+                uuid=image_uuid,
+                file_name=None,
+                file_base_path=FILE_BASE_PATH,
+            )
+            uow.images.add(image)
+
+        image.set_file_information(
+            file_base_path=FILE_BASE_PATH,
+            file_name=cmd.file_name,
+            file_extension=file_extension,
+            stored=True,
+        )
+
+        uow.commit()
 
 
 def add_meta_data_to_image(cmd, uow):

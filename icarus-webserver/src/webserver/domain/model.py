@@ -23,10 +23,12 @@ class Image:
             return file_base_path + "/" + file_name
         return ""
 
-    def set_file_information(self, file_base_path, file_name, file_extension):
+    def set_file_information(self, file_base_path, file_name, file_extension, stored):
         self.file_name = file_name
         self.file_path = self._get_file_path(file_base_path, file_name)
         self.file_extension = file_extension
+
+        self.stored = stored
 
     def _get_file_extension(self, file_name):
         if file_name:
@@ -36,14 +38,6 @@ class Image:
     @property
     def meta_data(self):
         return self._meta_data
-
-    def set_stored(self, stored):
-        self.stored = stored
-
-        if not stored:
-            return
-
-        self.events.append(events.StoredImageOnFileSystem(file_path=self.file_path))
 
     def asdict(self):
         return dict(
