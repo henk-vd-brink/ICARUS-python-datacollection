@@ -1,7 +1,9 @@
 import os
 import shutil
 import requests
+import textwrap
 import uuid
+import asyncio
 
 IP_ADDRESS = "localhost"
 FILE_PATH = "/home/prominendt/datasets/oxford-IIIT-pet-dataset/images/Abyssinian_10.jpg"
@@ -20,13 +22,14 @@ def post_file(
 
         try:
             response = requests.post(url, files=file, verify=False)
-            print(
-                f"""
+            log_msg = textwrap.dedent(
+                f"""\
                 id: {id}
-                status_code: {response.status_code}
-                tmp_file_name: {tmp_file_name}
+                    status_code: {response.status_code}
+                    tmp_file_name: {tmp_file_name}
                 """
             )
+            print(log_msg)
         except Exception as e:
             print(e)
         finally:
@@ -34,5 +37,5 @@ def post_file(
 
 
 if __name__ == "__main__":
-    for i in range(100):
-        post_file(id=i)
+    for id in range(1000):
+        post_file(id=id)
