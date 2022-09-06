@@ -1,6 +1,6 @@
 #!/bin/bash
 
-docker-compose -f docker-compose.build.yaml build
+docker-compose -f docker-compose.ci.build.yaml build
 
 while true; do
 read -p "Do you want to proceed? (y/n) " yn
@@ -12,4 +12,4 @@ case $yn in
 esac
 done
 
-docker-compose -f docker-compose.build.yaml push
+docker-compose -f docker-compose.ci.build.yaml push
