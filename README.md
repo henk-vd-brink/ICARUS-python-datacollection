@@ -14,7 +14,7 @@ cd ICARUS-python-datacollection
 
 ### Build
 ```
-docker-compose -f docker-compose.build.yaml build
+docker-compose -f docker-compose.ci.build.yaml build
 ```
 
 ### Run
