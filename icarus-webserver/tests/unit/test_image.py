@@ -14,7 +14,7 @@ def test_image_has_correct_attributes_after_instantiating():
     assert image.file_path == "/path/to/image/test_uuid.png"
     assert image.file_extension == "png"
     assert image.stored is False
-    assert isinstance(image.time_stamp, str)
+    assert isinstance(image.timestamp, str)
 
 
 def test_set_stored_true_sets_stored_true():

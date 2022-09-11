@@ -3,8 +3,6 @@ import datetime
 
 from ..domain import commands
 
-DATETIME_FORMAT = "%Y-%m-%dT%H:%M:%S.%fZ"
-
 
 def store_image_on_file_system(cmd, saver, rabbitmq_client):
     file_bytes = cmd.file_bytes
@@ -18,7 +16,7 @@ def store_image_on_file_system(cmd, saver, rabbitmq_client):
     with rabbitmq_client:
         msg_as_dict = {
             "file_name": file_name,
-            "time_stamp": datetime.datetime.now().strftime(DATETIME_FORMAT),
+            "timestamp": datetime.datetime.now().isoformat(),
         }
 
         rabbitmq_client.send(

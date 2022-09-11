@@ -1,4 +1,5 @@
 from dataclasses import dataclass, asdict
+import datetime
 
 from . import events
 
@@ -10,13 +11,13 @@ class Image:
         self.file_path = self._get_file_path(file_base_path, file_name)
         self.file_extension = self._get_file_extension(file_name)
         self.stored = False
-        self.time_stamp = self._get_time_stamp()
+        self.timestamp = self._get_timestamp()
         self._meta_data = meta_data
 
         self.events = []
 
-    def _get_time_stamp(self):
-        return "time_stamp"
+    def _get_timestamp(self):
+        return datetime.datetime.utcnow()
 
     def _get_file_path(self, file_base_path, file_name):
         if file_base_path and file_name:
@@ -46,7 +47,7 @@ class Image:
             file_path=self.file_path,
             file_extension=self.file_extension,
             stored=self.stored,
-            time_stamp=self.time_stamp,
+            timestamp=self.timestamp,
             meta_data=[asdict(m) for m in self._meta_data],
         )
 

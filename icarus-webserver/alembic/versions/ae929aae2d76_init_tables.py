@@ -24,7 +24,7 @@ def upgrade():
         sa.Column("file_path", sa.String(100), nullable=True),
         sa.Column("file_extension", sa.String(20), nullable=True),
         sa.Column("stored", sa.Boolean, nullable=True),
-        sa.Column("time_stamp", sa.String(50)),
+        sa.Column("timestamp", sa.DateTime),
     )
 
     op.create_table(

@@ -6,6 +6,7 @@ from sqlalchemy import (
     Integer,
     String,
     Date,
+    DateTime,
     Boolean,
     Float,
     ForeignKey,
@@ -28,7 +29,7 @@ images = Table(
     Column("file_path", String, nullable=True),
     Column("file_extension", String, nullable=True),
     Column("stored", Boolean, nullable=True),
-    Column("time_stamp", String, nullable=False),
+    Column("timestamp", DateTime, nullable=False),
 )
 
 image_meta_data = Table(

@@ -4,11 +4,7 @@ services:
   icarus-rabbitmqbroker:
     image: prominendt/icarus-dev:amd64-demo-rabbitmqbroker
     container_name: icarus-rabbitmqbroker
-    ports:
-      - 5672:5672
-      - 15672:15672
-      - 25672:25672
-    restart: always
+    restart: unless-stopped
 
   icarus-webserver-rabbitmq:
     image: prominendt/icarus-dev:amd64-demo-webserver
@@ -19,6 +15,7 @@ services:
       - DB_IP_ADDRESS=icarus-storage
     depends_on:
       - icarus-storage
+    restart: unless-stopped
 
   icarus-webserver:
     image: prominendt/icarus-dev:amd64-demo-webserver
@@ -31,6 +28,7 @@ services:
       - DB_IP_ADDRESS=icarus-storage
     depends_on:
       - icarus-storage
+    restart: unless-stopped
 
   icarus-filesaver:
     image: prominendt/icarus-dev:amd64-demo-filesaver
@@ -42,6 +40,7 @@ services:
       - HOST_MOUNT_PATH=/home/docker_user/data
     depends_on:
       - icarus-rabbitmqbroker
+    restart: unless-stopped
 
   icarus-storage:
     image: prominendt/icarus-dev:amd64-demo-storage
@@ -49,6 +48,7 @@ services:
     environment:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
+    restart: unless-stopped
 
   icarus-proxy:
     image: prominendt/icarus-dev:amd64-demo-proxy

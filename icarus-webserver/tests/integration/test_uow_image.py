@@ -4,19 +4,19 @@ pytestmark = pytest.mark.usefixtures("mappers")
 
 
 def insert_image(
-    session, uuid, file_name, file_path, file_extension, stored, time_stamp
+    session, uuid, file_name, file_path, file_extension, stored, timestamp
 ):
 
     session.execute(
-        "INSERT INTO images (uuid, file_name, file_path, file_extension, stored, time_stamp) \
-            VALUES (:uuid, :file_name, :file_path, :file_extension, :stored, :time_stamp)",
+        "INSERT INTO images (uuid, file_name, file_path, file_extension, stored, timestamp) \
+            VALUES (:uuid, :file_name, :file_path, :file_extension, :stored, :timestamp)",
         dict(
             uuid=uuid,
             file_name=file_name,
             file_path=file_path,
             file_extension=file_extension,
             stored=stored,
-            time_stamp=time_stamp,
+            timestamp=timestamp,
         ),
     )
 
@@ -40,7 +40,7 @@ def test_uow_can_retrieve_an_image(sqlite_session_factory):
         "/path/to/test-uuid1.png",
         "png",
         True,
-        "time_stamp",
+        "timestamp",
     )
     session.commit()
 
