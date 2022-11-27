@@ -16,10 +16,7 @@ bus = bootstrap_items.get("bus")
 
 
 @app.get("/images")
-async def get_all_images(
-    request: Request,
-    response: Response,
-):
+async def get_all_images():
     results = views.get_all_images(bus.uow)
     return JSONResponse(content=results)
 
@@ -68,7 +65,10 @@ async def create_image(
             request_dict,
         )
     except schema.SchemaError as e:
-        return HTTPException(404, detail=str(e))
+        raise HTTPException(422, detail=str(e))
+    except Exception as e:
+        logger.exception(e)
+        raise HTTPException(503, detail="Internal Server Error")
 
     response.status_code = 201
     return response
@@ -79,7 +79,7 @@ async def get_image_meta_data_by_uuid(request: Request, response: Response, uuid
     result = views.get_image_by_uuid(uuid=uuid, uow=bus.uow)
 
     if not result:
-        return HTTPException(404, detail="Item not found")
+        raise HTTPException(404, detail="Item not found")
 
     return JSONResponse(content=result)
 
@@ -91,14 +91,15 @@ async def get_image_meta_data_by_uuid(request: Request, response: Response, uuid
             "content": {
                 "application/json": {
                     "schema": {
-                        "required": ["label", "bx", "by", "w", "h"],
+                        "required": ["label", "x_1", "y_1", "x_2", "y_2", "confidence"],
                         "type": "object",
                         "properties": {
                             "label": {"type": "string"},
-                            "bx": {"type": "number"},
-                            "by": {"type": "number"},
-                            "w": {"type": "number"},
-                            "h": {"type": "number"},
+                            "x_1": {"type": "number"},
+                            "y_1": {"type": "number"},
+                            "x_2": {"type": "number"},
+                            "y_2": {"type": "number"},
+                            "confidence": {"type": "number"},
                         },
                     }
                 }
@@ -117,7 +118,10 @@ async def add_metadata_to_image(request: Request, response: Response, uuid: str)
             request_dict,
         )
     except schema.SchemaError as e:
-        return HTTPException(404, detail=str(e))
+        raise HTTPException(422, detail=str(e))
+    except Exception as e:
+        logger.exception(e)
+        raise HTTPException(503, detail="Internal Server Error")
 
     response.status_code = 201
     return response

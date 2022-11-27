@@ -7,9 +7,13 @@ services:
     ports:
       - 5671:5671
     volumes:
-      - ./dev/certs/root_ca.crt:/etc/rabbitmq/ssh/ss_certs/root_ca.crt:ro
-      - ./dev/certs/client-1.crt:/etc/rabbitmq/ssh/ss_certs/client.crt:ro
-      - ./dev/certs/client-1.key:/etc/rabbitmq/ssh/ss_certs/client.key:ro
+      - ${PWD}/dev/certs/root_ca.crt:/etc/rabbitmq/ssh/ss_certs/root_ca.crt:ro
+      - ${PWD}/dev/certs/client-1.crt:/etc/rabbitmq/ssh/ss_certs/client.crt:ro
+      - ${PWD}/dev/certs/client-1.key:/etc/rabbitmq/ssh/ss_certs/client.key:ro
+    environment:
+      - RABBITMQ_DEFAULT_USER=${RABBITMQ_BROKER_USERNAME:-guest}
+      - RABBITMQ_DEFAULT_PASS=${RABBITMQ_BROKER_PASSWORD:-guest}
+      - RABBITMQ_CONFIG_FILE=/etc/rabbitmq/config/rabbitmq.conf
     restart: unless-stopped
 
   icarus-webserver-rabbitmq:

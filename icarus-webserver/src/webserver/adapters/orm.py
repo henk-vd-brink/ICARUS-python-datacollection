@@ -38,10 +38,11 @@ image_meta_data = Table(
     Column("id", Integer, primary_key=True, autoincrement=True),
     Column("image_uuid", ForeignKey("images.uuid")),
     Column("label", String, nullable=True),
-    Column("bx", Float, nullable=True),
-    Column("by", Float, nullable=True),
-    Column("w", Float, nullable=True),
-    Column("h", Float, nullable=True),
+    Column("x_1", Float, nullable=True),
+    Column("y_1", Float, nullable=True),
+    Column("x_2", Float, nullable=True),
+    Column("y_2", Float, nullable=True),
+    Column("confidence", Float, nullable=True),
 )
 
 

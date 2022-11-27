@@ -1,4 +1,4 @@
-from schema import Schema, Or
+from schema import Schema
 from dataclasses import make_dataclass
 
 
@@ -18,11 +18,5 @@ CreateImage = command_factory("CreateImage", image_uuid=str, meta_data=list)
 CreateImageFromStoreEvent = command_factory("CreateImageFromStoreEvent", file_name=str)
 
 AddMetaDataToImage = command_factory(
-    "AddMetaDataToImage",
-    image_uuid=str,
-    label=Or(str, None),
-    bx=Or(float, None),
-    by=Or(float, None),
-    w=Or(float, None),
-    h=Or(float, None),
+    "AddMetaDataToImage", image_uuid=str, meta_data=list
 )

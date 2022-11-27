@@ -56,7 +56,8 @@ class Image:
 class ImageMetaData:
     image_uuid: str
     label: str
-    bx: float
-    by: float
-    w: float
-    h: float
+    x_1: float
+    y_1: float
+    x_2: float
+    y_2: float
+    confidence: float

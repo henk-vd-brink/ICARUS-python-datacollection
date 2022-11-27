@@ -34,16 +34,28 @@ def stored_image_on_file_system_callback(ch, method, properties, parsed_message)
         logger.exception(str(e))
 
 
-CHANNEL_MAPPER = {"StoredImageOnFileSystem": stored_image_on_file_system_callback}
+@ParseIncomingRabbitMqMessage()
+def detected_objects_callback(ch, method, properties, parsed_message):
+    try:
+        bus.handle_message("AddMetaDataToImage", parsed_message)
+    except Exception as e:
+        logger.exception(str(e))
+
+
+CHANNEL_MAPPER = {
+    "StoredImageOnFileSystem": stored_image_on_file_system_callback,
+    "DetectedObjects": detected_objects_callback,
+}
 
 
 if __name__ == "__main__":
     broker_client.connect()
 
-    for channel, call_back in CHANNEL_MAPPER.items():
-        broker_client.channel.queue_declare(queue=channel)
+    for queue, call_back in CHANNEL_MAPPER.items():
+        broker_client.channel.queue_declare(queue=queue)
+
         broker_client.channel.basic_consume(
-            queue=channel,
+            queue=queue,
             on_message_callback=call_back,
             auto_ack=True,
         )

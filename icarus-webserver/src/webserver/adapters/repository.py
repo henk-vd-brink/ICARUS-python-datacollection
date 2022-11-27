@@ -30,3 +30,13 @@ class ImageSqlAlchemyRepository(AbstractRepository):
     def add(self, obj):
         self.session.add(obj)
         self.seen.add(obj)
+
+
+class ImageMetaDataSqlAlchemyRepository(AbstractRepository):
+    def __init__(self, session):
+        super().__init__()
+        self.session = session
+
+    def add(self, obj):
+        self.session.add(obj)
+        self.seen.add(obj)

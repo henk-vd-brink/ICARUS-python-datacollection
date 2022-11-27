@@ -64,6 +64,10 @@ def create_image_from_store_event(cmd, uow):
 
 def add_meta_data_to_image(cmd, uow):
     image_uuid = cmd.image_uuid
+    image_meta_data = cmd.meta_data
+
+    if image_meta_data is None:
+        return
 
     with uow:
         image = uow.images.get(uuid=image_uuid)
@@ -76,16 +80,21 @@ def add_meta_data_to_image(cmd, uow):
             )
             uow.images.add(image)
 
-        image_meta_data = model.ImageMetaData(
-            image_uuid=image_uuid,
-            label=cmd.label,
-            bx=cmd.bx,
-            by=cmd.by,
-            w=cmd.w,
-            h=cmd.h,
-        )
+        while image_meta_data:
+            meta_data = image_meta_data.pop()
 
-        image.meta_data.add(image_meta_data)
+            image.meta_data.add(
+                model.ImageMetaData(
+                    image_uuid=image_uuid,
+                    label=meta_data.get("label"),
+                    x_1=meta_data.get("x_1"),
+                    y_1=meta_data.get("y_1"),
+                    x_2=meta_data.get("x_2"),
+                    y_2=meta_data.get("y_2"),
+                    confidence=meta_data.get("confidence")
+                )
+            )
+
         uow.commit()
 
 

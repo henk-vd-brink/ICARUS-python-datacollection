@@ -49,7 +49,11 @@ class SqlAlchemyUnitOfWork(AbstractUnitOfWork):
 
     def __enter__(self):
         self.session = self.session_factory()  # type: Session
+
         self.images = repository.ImageSqlAlchemyRepository(self.session)
+        self.image_meta_data = repository.ImageMetaDataSqlAlchemyRepository(
+            self.session
+        )
         return super().__enter__()
 
     def __exit__(self, *args):
