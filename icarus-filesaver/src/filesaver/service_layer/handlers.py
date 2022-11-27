@@ -8,7 +8,7 @@ def store_image_on_file_system(cmd, saver, rabbitmq_client):
     file_bytes = cmd.file_bytes
     file_name = cmd.file_name
 
-    saver.add(file_name=file_name, bytes=file_bytes)
+    saver.save_file(file_name=file_name, file_bytes=file_bytes)
 
     if not saver.file_exists(file_name=file_name):
         return

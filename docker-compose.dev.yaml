@@ -4,6 +4,12 @@ services:
   icarus-rabbitmqbroker:
     image: prominendt/icarus-dev:amd64-demo-rabbitmqbroker
     container_name: icarus-rabbitmqbroker
+    ports:
+      - 5671:5671
+    volumes:
+      - ./dev/certs/root_ca.crt:/etc/rabbitmq/ssh/ss_certs/root_ca.crt:ro
+      - ./dev/certs/client-1.crt:/etc/rabbitmq/ssh/ss_certs/client.crt:ro
+      - ./dev/certs/client-1.key:/etc/rabbitmq/ssh/ss_certs/client.key:ro
     restart: unless-stopped
 
   icarus-webserver-rabbitmq:
@@ -32,12 +38,14 @@ services:
 
   icarus-filesaver:
     image: prominendt/icarus-dev:amd64-demo-filesaver
-    container_name: icarus-filesaver
+    # container_name: icarus-filesaver
     entrypoint: [ "./scripts/start.fastapi.sh" ]
-    ports:
-      - 7000:8000
+    expose:
+      - "8000"
     environment:
       - HOST_MOUNT_PATH=/home/docker_user/data
+    volumes:
+      - ${HOME}/data/tmp/filesaver:/home/docker_user/data
     depends_on:
       - icarus-rabbitmqbroker
     restart: unless-stopped
@@ -54,10 +62,10 @@ services:
     image: prominendt/icarus-dev:amd64-demo-proxy
     container_name: icarus-proxy
     ports:
-      - 443:443
+      - 8443:443
     volumes:
-      - ./icarus-proxy/certs/nginx-selfsigned.crt:/etc/ssl/certs/nginx-selfsigned.crt:ro
-      - ./icarus-proxy/certs/nginx-selfsigned.key:/etc/ssl/private/nginx-selfsigned.key:ro
+      - ./dev/certs/client-1.crt:/etc/ssl/certs/nginx-selfsigned.crt:ro
+      - ./dev/certs/client-1.key:/etc/ssl/private/nginx-selfsigned.key:ro
     depends_on:
       - icarus-webserver
     restart: unless-stopped

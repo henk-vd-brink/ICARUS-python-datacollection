@@ -1,5 +1,6 @@
 import os
 import logging
+import schema
 
 from fastapi import FastAPI, Request, Response, HTTPException, UploadFile
 from fastapi.responses import FileResponse
@@ -37,9 +38,10 @@ async def upload_file(request: Request, response: Response, file: UploadFile = N
 
         handler = command_handlers[type(cmd)]
         handler(cmd)
-    except Exception:
+    except Exception as e:
+        logger.exception(e)
         return HTTPException(500, detail="Internal Server Error")
 
     response.status_code = 204
-    response.headers.update({"Location": "/uploaded_images/" + file.filename})
+    response.headers.update({"location": "/uploaded_images/" + file.filename})
     return response
