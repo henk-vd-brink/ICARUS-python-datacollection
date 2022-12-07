@@ -1,11 +1,12 @@
 version: "3.8"
 
 services:
-  icarus-rabbitmqbroker:
-    image: prominendt/icarus-dev:amd64-demo-rabbitmqbroker
-    container_name: icarus-rabbitmqbroker
+  icarus-fog-rabbitmqbroker:
+    image: cricarusprod001.azurecr.io/icarus-fog-rabbitmqbroker
+    container_name: icarus-fog-rabbitmqbroker
     ports:
       - 5671:5671
+      - 5672:5672
     volumes:
       - ${PWD}/dev/certs/root_ca.crt:/etc/rabbitmq/ssh/ss_certs/root_ca.crt:ro
       - ${PWD}/dev/certs/client-1.crt:/etc/rabbitmq/ssh/ss_certs/client.crt:ro
@@ -13,35 +14,37 @@ services:
     environment:
       - RABBITMQ_DEFAULT_USER=${RABBITMQ_BROKER_USERNAME:-guest}
       - RABBITMQ_DEFAULT_PASS=${RABBITMQ_BROKER_PASSWORD:-guest}
-      - RABBITMQ_CONFIG_FILE=/etc/rabbitmq/config/rabbitmq.conf
-    restart: unless-stopped
+      # - RABBITMQ_CONFIG_FILE=/etc/rabbitmq/config/rabbitmq.conf
+    restart: always
 
-  icarus-webserver-rabbitmq:
-    image: prominendt/icarus-dev:amd64-demo-webserver
-    container_name: icarus-webserver-rabbitmq
+  icarus-fog-webserver-rabbitmq:
+    image: cricarusprod001.azurecr.io/icarus-fog-webserver
+    container_name: icarus-fog-webserver-rabbitmq
     entrypoint: [ "./scripts/start.rabbitmq.sh" ]
     environment:
+      - DB_USER_USERNAME=postgres
       - DB_USER_PASSWORD=postgres
-      - DB_IP_ADDRESS=icarus-storage
+      - DB_IP_ADDRESS=icarus-fog-storage
     depends_on:
-      - icarus-storage
-    restart: unless-stopped
+      - icarus-fog-rabbitmqbroker
+    restart: always
 
-  icarus-webserver:
-    image: prominendt/icarus-dev:amd64-demo-webserver
-    container_name: icarus-webserver
+  icarus-fog-webserver:
+    image: cricarusprod001.azurecr.io/icarus-fog-webserver
+    container_name: icarus-fog-webserver
     entrypoint: [ "./scripts/start.fastapi.sh" ]
     ports:
       - 8000:8000
     environment:
+      - DB_USER_USERNAME=postgres
       - DB_USER_PASSWORD=postgres
-      - DB_IP_ADDRESS=icarus-storage
+      - DB_IP_ADDRESS=icarus-fog-storage
     depends_on:
-      - icarus-storage
-    restart: unless-stopped
+      - icarus-fog-storage
+    restart: always
 
-  icarus-filesaver:
-    image: prominendt/icarus-dev:amd64-demo-filesaver
+  icarus-fog-filesaver:
+    image: cricarusprod001.azurecr.io/icarus-fog-filesaver
     # container_name: icarus-filesaver
     entrypoint: [ "./scripts/start.fastapi.sh" ]
     expose:
@@ -51,28 +54,28 @@ services:
     volumes:
       - ${HOME}/data/tmp/filesaver:/home/docker_user/data
     depends_on:
-      - icarus-rabbitmqbroker
-    restart: unless-stopped
+      - icarus-fog-rabbitmqbroker
+    restart: always
 
-  icarus-storage:
-    image: prominendt/icarus-dev:amd64-demo-storage
-    container_name: icarus-storage
+  icarus-fog-storage:
+    image: cricarusprod001.azurecr.io/icarus-fog-storage
+    container_name: icarus-fog-storage
     environment:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
-    restart: unless-stopped
+    restart: always
 
-  icarus-proxy:
-    image: prominendt/icarus-dev:amd64-demo-proxy
-    container_name: icarus-proxy
+  icarus-fog-proxy:
+    image: cricarusprod001.azurecr.io/icarus-fog-proxy
+    container_name: icarus-fog-proxy
     ports:
       - 8443:443
     volumes:
       - ./dev/certs/client-1.crt:/etc/ssl/certs/nginx-selfsigned.crt:ro
       - ./dev/certs/client-1.key:/etc/ssl/private/nginx-selfsigned.key:ro
     depends_on:
-      - icarus-webserver
-    restart: unless-stopped
+      - icarus-fog-webserver
+    restart: always
 
   # Debug containers
   pgadmin:
@@ -82,4 +85,4 @@ services:
     environment:
       PGADMIN_DEFAULT_EMAIL: pgadmin4@pgadmin.org
       PGADMIN_DEFAULT_PASSWORD: admin
-    restart: unless-stopped
+    restart: always

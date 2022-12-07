@@ -1,32 +1,32 @@
 version: "3.8"
 
 services:
-  icarus-rabbitmqbroker:
+  icarus-fog-rabbitmqbroker:
     build:
-      context: icarus-rabbitmqbroker
+      context: icarus-fog-rabbitmqbroker
       dockerfile: Dockerfile
-    image: prominendt/icarus-dev:amd64-demo-rabbitmqbroker
+    image: cricarusprod001.azurecr.io/icarus-fog-rabbitmqbroker
 
-  icarus-webserver:
+  icarus-fog-webserver:
     build:
-      context: icarus-webserver
+      context: icarus-fog-webserver
       dockerfile: Dockerfile
-    image: prominendt/icarus-dev:amd64-demo-webserver
+    image: cricarusprod001.azurecr.io/icarus-fog-webserver
 
-  icarus-filesaver:
+  icarus-fog-filesaver:
     build:
-      context: icarus-filesaver
+      context: icarus-fog-filesaver
       dockerfile: Dockerfile
-    image: prominendt/icarus-dev:amd64-demo-filesaver
+    image: cricarusprod001.azurecr.io/icarus-fog-filesaver
 
-  icarus-storage:
+  icarus-fog-storage:
     build:
-      context: icarus-storage
+      context: icarus-fog-storage
       dockerfile: Dockerfile
-    image: prominendt/icarus-dev:amd64-demo-storage
+    image: cricarusprod001.azurecr.io/icarus-fog-storage
 
-  icarus-proxy:
+  icarus-fog-proxy:
     build:
-      context: icarus-proxy
+      context: icarus-fog-proxy
       dockerfile: Dockerfile
-    image: prominendt/icarus-dev:amd64-demo-proxy
+    image: cricarusprod001.azurecr.io/icarus-fog-proxy

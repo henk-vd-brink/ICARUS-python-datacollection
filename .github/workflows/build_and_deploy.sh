@@ -1,0 +1,110 @@
+
+name: Build and Deploy
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build:
+    environment: icarus
+    env: 
+      CONTAINER_REGISTRY_URL: ${{ secrets.CONTAINER_REGISTRY_URL }}
+      CONTAINER_REGISTRY_USERNAME: ${{ secrets.CONTAINER_REGISTRY_USERNAME }}
+      CONTAINER_REGISTRY_ACCESS_TOKEN: ${{ secrets.CONTAINER_REGISTRY_ACCESS_TOKEN }}
+      
+    runs-on: ubuntu-latest
+
+    steps:
+      -
+        name: Checkout 
+        uses: actions/checkout@v3
+      - 
+        name: Extract branch name
+        shell: bash
+        run: echo "##[set-output name=tag;]$(echo ${GITHUB_REF_NAME}-${GITHUB_SHA})"
+        id: extract_branch
+      -
+        name: Set up QEMU
+        uses: docker/setup-qemu-action@master
+        with:
+          platforms: linux/arm64
+      - 
+        name: Set up Docker Buildx
+        id: buildx
+        uses: docker/setup-buildx-action@master
+      - 
+        name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+      -
+        name: Login to Azure Container Registry
+        uses: docker/login-action@v2
+        with:
+          registry: ${{ env.CONTAINER_REGISTRY_URL }}
+          username: ${{ env.CONTAINER_REGISTRY_USERNAME }}
+          password: ${{ env.CONTAINER_REGISTRY_ACCESS_TOKEN }}
+      -
+        name: Build and Push icarus-fog-filesaver
+        uses: docker/build-push-action@v3
+        with:
+          builder: ${{ steps.buildx.outputs.name }}
+          context: "{{defaultContext}}:icarus-fog-filesaver"
+          file: Dockerfile
+          push: true
+          platforms: linux/arm64, linux/amd64
+          tags: ${{ env.CONTAINER_REGISTRY_URL }}/icarus-fog-filesaver:${{ steps.extract_branch.outputs.tag }}, ${{ env.CONTAINER_REGISTRY_URL }}/icarus-fog-filesaver:latest
+      -
+        name: Build and Push icarus-fog-proxy
+        uses: docker/build-push-action@v3
+        with:
+          builder: ${{ steps.buildx.outputs.name }}
+          context: "{{defaultContext}}:icarus-fog-proxy"
+          file: Dockerfile
+          push: true
+          platforms: linux/arm64, linux/amd64
+          tags: ${{ env.CONTAINER_REGISTRY_URL }}/icarus-fog-proxy:${{ steps.extract_branch.outputs.tag }}, ${{ env.CONTAINER_REGISTRY_URL }}/icarus-fog-proxy:latest
+      -
+        name: Build and Push icarus-fog-rabbitmqbroker
+        uses: docker/build-push-action@v3
+        with:
+          builder: ${{ steps.buildx.outputs.name }}
+          context: "{{defaultContext}}:icarus-fog-rabbitmqbroker"
+          file: Dockerfile
+          push: true
+          platforms: linux/arm64, linux/amd64
+          tags: ${{ env.CONTAINER_REGISTRY_URL }}/icarus-fog-rabbitmqbroker:${{ steps.extract_branch.outputs.tag }}, ${{ env.CONTAINER_REGISTRY_URL }}/icarus-fog-rabbitmqbroker:latest
+      -
+        name: Build and Push icarus-fog-storage
+        uses: docker/build-push-action@v3
+        with:
+          builder: ${{ steps.buildx.outputs.name }}
+          context: "{{defaultContext}}:icarus-fog-storage"
+          file: Dockerfile
+          push: true
+          platforms: linux/arm64, linux/amd64
+          tags: ${{ env.CONTAINER_REGISTRY_URL }}/icarus-fog-storage:${{ steps.extract_branch.outputs.tag }}, ${{ env.CONTAINER_REGISTRY_URL }}/icarus-fog-storage:latest
+      -
+        name: Build and Push icarus-fog-webserver
+        uses: docker/build-push-action@v3
+        with:
+          builder: ${{ steps.buildx.outputs.name }}
+          context: "{{defaultContext}}:icarus-fog-webserver"
+          file: Dockerfile
+          push: true
+          platforms: linux/arm64, linux/amd64
+          tags: ${{ env.CONTAINER_REGISTRY_URL }}/icarus-fog-webserver:${{ steps.extract_branch.outputs.tag }}, ${{ env.CONTAINER_REGISTRY_URL }}/icarus-fog-webserver:latest
+    #   -
+    #     name: Az CLI login
+    #     uses: azure/actions/login@v1
+    #     with:
+    #       creds: ${{ secrets.AZURE_CREDENTIALS }}
+    #   - 
+    #     name: Azure CLI script
+    #     uses: azure/CLI@v1
+    #     with:
+    #       azcliversion: 2.30.0
+    #       inlineScript: |
+    #         chmod +x $GITHUB_WORKSPACE/scripts/deploy_to_azure_iotedge.sh
+    #         $GITHUB_WORKSPACE/scripts/deploy_to_azure_iotedge.sh ${{ steps.extract_branch.outputs.tag }} dev-${{ steps.extract_branch.outputs.tag }}
