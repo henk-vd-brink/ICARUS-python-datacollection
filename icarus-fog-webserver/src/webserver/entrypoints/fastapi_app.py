@@ -61,3 +61,11 @@ async def get_uploaded_image_from_file_name(file_name):
         return HTTPException(404, detail="Bad Request")
 
     return FileResponse(absolute_file_path)
+
+
+if __name__ == "__main__":
+    pass
+else:
+    gunicorn_logger = logging.getLogger("gunicorn.info")
+    logger.handlers = gunicorn_logger.handlers
+    logger.setLevel(gunicorn_logger.level)
