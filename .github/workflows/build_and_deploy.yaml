@@ -52,17 +52,6 @@ jobs:
           password: ${{ env.CONTAINER_REGISTRY_ACCESS_TOKEN }}
 
       -
-        name: Build and Push icarus-fog-filesaver
-        uses: docker/build-push-action@v3
-        with:
-          builder: ${{ steps.buildx.outputs.name }}
-          context: "{{defaultContext}}:icarus-fog-filesaver"
-          file: Dockerfile
-          push: true
-          platforms: linux/arm64, linux/amd64
-          tags: ${{ env.CONTAINER_REGISTRY_URL }}/icarus-fog-filesaver:${{ steps.extract_branch.outputs.tag }}, ${{ env.CONTAINER_REGISTRY_URL }}/icarus-fog-filesaver:latest
-
-      -
         name: Build and Push icarus-fog-proxy
         uses: docker/build-push-action@v3
         with:
@@ -94,7 +83,7 @@ jobs:
           push: true
           platforms: linux/arm64, linux/amd64
           tags: ${{ env.CONTAINER_REGISTRY_URL }}/icarus-fog-storage:${{ steps.extract_branch.outputs.tag }}, ${{ env.CONTAINER_REGISTRY_URL }}/icarus-fog-storage:latest
-          
+
       -
         name: Build and Push icarus-fog-webserver
         uses: docker/build-push-action@v3
