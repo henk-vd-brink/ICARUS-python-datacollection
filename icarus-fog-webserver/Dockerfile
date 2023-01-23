@@ -23,8 +23,11 @@ COPY tests/ ${HOME}/tests
 
 RUN pip install -e ${HOME}/src
 
+RUN mkdir /tmp/uwsgi
+
 RUN useradd docker_user \
     && chown -R "docker_user:docker_user" ${HOME} \
+    && chown -R "docker_user:docker_user" /tmp/uwsgi \
     && chmod g+r ${HOME} \
     && chmod 755 ${HOME}/scripts/*
 

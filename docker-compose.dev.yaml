@@ -35,7 +35,7 @@ services:
     container_name: icarus-fog-webserver-fastapi
     volumes:
       - ${HOME}/data/tmp/filesaver:/home/docker_user/data
-      - nginx-uwsgi:/tmp/
+      - nginx-uwsgi:/tmp/uwsgi/
     entrypoint: [ "./scripts/start.fastapi.sh" ]
     ports:
       - 8000:8000 
