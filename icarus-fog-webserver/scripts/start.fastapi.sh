@@ -1,4 +1,9 @@
 #!/bin/bash
 
 alembic upgrade head \
-&& uvicorn src.webserver.entrypoints.fastapi_app:app --host 0.0.0.0 --port 8000
+&& python3 -m gunicorn src.webserver.entrypoints.fastapi_app:app \
+    --workers 4 \
+    --worker-class uvicorn.workers.UvicornWorker \
+    --bind unix:/tmp/gunicorn.sock \
+    --log-level INFO \
+    --access-logfile -

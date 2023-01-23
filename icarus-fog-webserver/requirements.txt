@@ -9,3 +9,4 @@ pydantic
 schema
 pika
 pytest
+gunicorn==20.1.0

@@ -30,6 +30,9 @@ class AbstractUnitOfWork(abc.ABC):
         raise NotImplementedError
 
     def collect_new_events(self):
+        if self.images is None:
+            return StopIteration
+
         for image in self.images.seen:
             while image.events:
                 yield image.events.pop(0)
@@ -44,6 +47,8 @@ DEFAULT_SESSION_FACTORY = sessionmaker(
 
 
 class SqlAlchemyUnitOfWork(AbstractUnitOfWork):
+    images: repository.AbstractRepository = None
+
     def __init__(self, session_factory=DEFAULT_SESSION_FACTORY):
         self.session_factory = session_factory
 

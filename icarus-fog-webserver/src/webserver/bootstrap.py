@@ -1,9 +1,8 @@
 import inspect
-import os
 import logging
 from . import config
 
-from .adapters import orm, rabbitmq_client as rbc
+from .adapters import orm, rabbitmq_client as rbc, file_saver as fs
 
 from .service_layer import messagebus, handlers, unit_of_work as uow
 
@@ -12,14 +11,23 @@ logging.basicConfig(level=logging.INFO)
 
 def bootstrap(
     start_orm: bool = True,
+    connect_to_rabbitmq_broker: bool = True,
     unit_of_work=uow.SqlAlchemyUnitOfWork(),
     rabbitmq_client=rbc.RabbitmqClient(config=config.get_rabbitmq_config()),
+    file_saver=fs.FileSaver(),
 ):
 
     if start_orm:
         orm.start_mappers()
 
-    dependencies = {"uow": unit_of_work}
+    if connect_to_rabbitmq_broker:
+        rabbitmq_client.connect()
+
+    dependencies = {
+        "uow": unit_of_work,
+        "file_saver": file_saver,
+        "rabbitmq_client": rabbitmq_client,
+    }
 
     injected_event_handlers = {
         event_type: [

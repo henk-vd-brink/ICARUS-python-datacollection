@@ -7,6 +7,7 @@ services:
     ports:
       - 5671:5671
       - 5672:5672
+      - 15672:15672
     volumes:
       - ${PWD}/dev/certs/root_ca.crt:/etc/rabbitmq/ssh/ss_certs/root_ca.crt:ro
       - ${PWD}/dev/certs/client-1.crt:/etc/rabbitmq/ssh/ss_certs/client.crt:ro
@@ -29,9 +30,12 @@ services:
       - icarus-fog-rabbitmqbroker
     restart: always
 
-  icarus-fog-webserver:
+  icarus-fog-webserver-fastapi:
     image: cricarusprod001.azurecr.io/icarus-fog-webserver
-    container_name: icarus-fog-webserver
+    container_name: icarus-fog-webserver-fastapi
+    volumes:
+      - ${HOME}/data/tmp/filesaver:/home/docker_user/data
+      - nginx-uwsgi:/tmp/
     entrypoint: [ "./scripts/start.fastapi.sh" ]
     ports:
       - 8000:8000
@@ -41,19 +45,6 @@ services:
       - DB_IP_ADDRESS=icarus-fog-storage
     depends_on:
       - icarus-fog-storage
-    restart: always
-
-  icarus-fog-filesaver:
-    image: cricarusprod001.azurecr.io/icarus-fog-filesaver
-    # container_name: icarus-filesaver
-    entrypoint: [ "./scripts/start.fastapi.sh" ]
-    expose:
-      - "8000"
-    environment:
-      - HOST_MOUNT_PATH=/home/docker_user/data
-    volumes:
-      - ${HOME}/data/tmp/filesaver:/home/docker_user/data
-    depends_on:
       - icarus-fog-rabbitmqbroker
     restart: always
 
@@ -73,8 +64,9 @@ services:
     volumes:
       - ./dev/certs/client-1.crt:/etc/ssl/certs/nginx-selfsigned.crt:ro
       - ./dev/certs/client-1.key:/etc/ssl/private/nginx-selfsigned.key:ro
+      - nginx-uwsgi:/tmp/uwsgi/
     depends_on:
-      - icarus-fog-webserver
+      - icarus-fog-webserver-fastapi
     restart: always
 
   # Debug containers
@@ -86,3 +78,7 @@ services:
       PGADMIN_DEFAULT_EMAIL: pgadmin4@pgadmin.org
       PGADMIN_DEFAULT_PASSWORD: admin
     restart: always
+
+
+volumes:
+  nginx-uwsgi: null

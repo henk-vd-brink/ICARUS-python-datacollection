@@ -12,6 +12,10 @@ class AbstractRepository(abc.ABC):
         self.session = None
         self.seen = set()
 
+    def add(self, obj):
+        self.session.add(obj)
+        self.seen.add(obj)
+
 
 class ImageSqlAlchemyRepository(AbstractRepository):
     def __init__(self, session):
@@ -27,16 +31,8 @@ class ImageSqlAlchemyRepository(AbstractRepository):
     def get_all(self):
         return self.session.query(model.Image).all()
 
-    def add(self, obj):
-        self.session.add(obj)
-        self.seen.add(obj)
-
 
 class ImageMetaDataSqlAlchemyRepository(AbstractRepository):
     def __init__(self, session):
         super().__init__()
         self.session = session
-
-    def add(self, obj):
-        self.session.add(obj)
-        self.seen.add(obj)

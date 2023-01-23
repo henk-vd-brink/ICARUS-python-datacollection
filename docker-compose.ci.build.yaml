@@ -13,12 +13,6 @@ services:
       dockerfile: Dockerfile
     image: cricarusprod001.azurecr.io/icarus-fog-webserver
 
-  icarus-fog-filesaver:
-    build:
-      context: icarus-fog-filesaver
-      dockerfile: Dockerfile
-    image: cricarusprod001.azurecr.io/icarus-fog-filesaver
-
   icarus-fog-storage:
     build:
       context: icarus-fog-storage

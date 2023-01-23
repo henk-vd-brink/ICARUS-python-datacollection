@@ -1,63 +1,71 @@
 from dataclasses import dataclass, asdict
 import datetime
+import pathlib
 
 from . import events
 
 
 class Image:
-    def __init__(self, uuid, file_name, file_base_path, meta_data=set()):
+    def __init__(self, uuid, file_name=None, file_path=None, meta_data=set()):
         self.uuid = uuid
         self.file_name = file_name
-        self.file_path = self._get_file_path(file_base_path, file_name)
-        self.file_extension = self._get_file_extension(file_name)
+        self.file_path = file_path
+
+        if file_path:
+            self.file_extension = pathlib.Path(file_path).suffix
+
         self.stored = False
-        self.timestamp = self._get_timestamp()
+        self.timestamp = datetime.datetime.utcnow()
         self._meta_data = meta_data
 
         self.events = []
 
-    def _get_timestamp(self):
-        return datetime.datetime.utcnow()
+    def get_meta_data(self):
+        return [asdict(m) for m in self._meta_data]
 
-    def _get_file_path(self, file_base_path, file_name):
-        if file_base_path and file_name:
-            return file_base_path + "/" + file_name
-        return ""
+    def add_meta_data(self, meta_data):
+        for meta_data_element in meta_data:
+            self._meta_data.add(ImageMetaData.from_dict(meta_data_element))
 
-    def set_file_information(self, file_base_path, file_name, file_extension, stored):
-        self.file_name = file_name
-        self.file_path = self._get_file_path(file_base_path, file_name)
-        self.file_extension = file_extension
+        if meta_data:
+            self.events.append(events.StoredImageMetaData(self.uuid))
 
+    @classmethod
+    def from_file_path(cls, file_path):
+        file = pathlib.Path(file_path)
+
+        uuid = file.stem
+        file_name = file.name
+
+        return cls(
+            uuid=uuid,
+            file_name=file_name,
+            file_path=file_path,
+        )
+
+    def set_stored(self, stored):
         self.stored = stored
 
-    def _get_file_extension(self, file_name):
-        if file_name:
-            return file_name.split(".")[-1]
-        return ""
-
-    @property
-    def meta_data(self):
-        return self._meta_data
-
-    def asdict(self):
-        return dict(
-            uuid=self.uuid,
-            file_name=self.file_name,
-            file_path=self.file_path,
-            file_extension=self.file_extension,
-            stored=self.stored,
-            timestamp=self.timestamp,
-            meta_data=[asdict(m) for m in self._meta_data],
-        )
+        if stored:
+            self.events.append(events.StoredUploadedImage(self.uuid))
 
 
 @dataclass(unsafe_hash=True)
 class ImageMetaData:
-    image_uuid: str
     label: str
     x_1: float
     y_1: float
     x_2: float
     y_2: float
     confidence: float
+
+    @classmethod
+    def from_dict(cls, input_dict):
+        return cls(
+            label=input_dict["label"],
+            x_1=input_dict["x_1"],
+            y_1=input_dict["y_1"],
+            x_2=input_dict["x_2"],
+            y_2=input_dict["y_2"],
+            confidence=input_dict["confidence"],
+        )

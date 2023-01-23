@@ -37,16 +37,14 @@ def get_all_images(uow):
 
 def get_image_by_uuid(uuid, uow):
     with uow:
-        result = (
-            uow.session.query(domain.model.Image)
-            .filter(domain.model.Image.uuid == uuid)
-            .first()
-        )
-        uow.session.commit()
+        result = uow.session.execute(
+            """
+                SELECT * FROM images WHERE uuid = :uuid
+            """,
+            dict(uuid=uuid),
+        ).first()
 
-        if not result:
-            return
+    if not result:
+        return
 
-        result_dict = result.asdict()
-
-    return _preserialize(result_dict)
+    return _preserialize(dict(result))

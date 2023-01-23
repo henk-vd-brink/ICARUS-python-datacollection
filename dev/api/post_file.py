@@ -4,7 +4,7 @@ import uuid
 
 IP_ADDRESS = "localhost"
 IMAGE_PATH = (
-    "/home/prominendt/datasets/oxford-IIIT-pet-dataset/images/Abyssinian_10.jpg"
+    "/home/prominendt/repos/ICARUS-python-datacollection/dev/assets/test-image.jpg"
 )
 
 
@@ -15,7 +15,7 @@ def get_image_bytes(image_path: str = IMAGE_PATH):
 
 def get_tasks(session, url, file_bytes):
     tasks = []
-    for _ in range(1000):
+    for _ in range(2):
         data = aiohttp.FormData()
         data.add_field(
             "file",
@@ -44,7 +44,7 @@ async def main():
     image_bytes = get_image_bytes()
 
     await post_images(
-        url=f"http://{IP_ADDRESS}:7000/files",
+        url=f"https://{IP_ADDRESS}:8443/uploaded_images",
         file_bytes=image_bytes,
     )
 

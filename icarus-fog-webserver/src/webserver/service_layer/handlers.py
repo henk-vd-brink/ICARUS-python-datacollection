@@ -1,5 +1,7 @@
 import logging
-import dataclasses
+import json
+import pathlib
+import datetime
 
 from .. import config
 from ..domain import model, commands, events
@@ -9,106 +11,123 @@ logger = logging.getLogger(__name__)
 FILE_BASE_PATH = config.get_host_mount_path()
 
 
+def store_uploaded_image(cmd, file_saver, rabbitmq_client):
+    file_name = cmd.file_name
+    file_bytes = cmd.file_bytes
+
+    uuid, _ = file_name.split(".")
+
+    file_saver.save(file_name=file_name, file_bytes=file_bytes)
+
+    if not file_saver.file_exists(file_name):
+        logger.info("NOT STORED uploaded image on file_system.")
+        return
+
+    message_as_dict = {
+        "uuid": uuid,
+        "file_path": file_saver.get_absolute_file_path(file_name),
+        "timestamp": datetime.datetime.now().isoformat(),
+        "meta_data": None,
+    }
+
+    if not rabbitmq_client.channel.is_open:
+        rabbitmq_client.connect()
+
+    rabbitmq_client.channel.basic_publish(
+        exchange="StoredImageOnFileSystem",
+        routing_key="",
+        body=json.dumps(message_as_dict),
+    )
+
+    logger.info("STORED uploaded image on file_system.")
+
+
 def create_image(cmd, uow):
-    image_uuid = cmd.image_uuid
-    meta_data = cmd.meta_data
+    uuid = cmd.uuid
+    file_path = cmd.file_path
 
     with uow:
-        image = uow.images.get(uuid=image_uuid)
+        image = uow.images.get(uuid=uuid)
 
         if image is None:
-            image = model.Image(
-                uuid=image_uuid,
-                file_name=None,
-                file_base_path=FILE_BASE_PATH,
-            )
+            image = model.Image.from_file_path(file_path)
             uow.images.add(image)
+        else:
+            image.file_name = pathlib.Path(file_path).name
+            image.file_path = file_path
 
-        for meta_data_element in meta_data:
-            image_meta_data = model.ImageMetaData(
-                image_uuid=image_uuid,
-                label=meta_data_element.get("label"),
-                bx=meta_data_element.get("bx"),
-                by=meta_data_element.get("by"),
-                w=meta_data_element.get("w"),
-                h=meta_data_element.get("h"),
-            )
-            image.meta_data.add(image_meta_data)
+        image.set_stored(stored=True)
 
         uow.commit()
 
-
-def create_image_from_store_event(cmd, uow):
-    image_uuid, file_extension = cmd.file_name.split(".")
-
-    with uow:
-        image = uow.images.get(uuid=image_uuid)
-
-        if image is None:
-            image = model.Image(
-                uuid=image_uuid,
-                file_name=None,
-                file_base_path=FILE_BASE_PATH,
-            )
-            uow.images.add(image)
-
-        image.set_file_information(
-            file_base_path=FILE_BASE_PATH,
-            file_name=cmd.file_name,
-            file_extension=file_extension,
-            stored=True,
-        )
-
-        uow.commit()
+    logger.info("STORED image in database.")
 
 
 def add_meta_data_to_image(cmd, uow):
-    image_uuid = cmd.image_uuid
-    image_meta_data = cmd.meta_data
-
-    if image_meta_data is None:
-        return
+    uuid = cmd.image_uuid
+    meta_data = cmd.meta_data
 
     with uow:
-        image = uow.images.get(uuid=image_uuid)
+        image = uow.images.get(uuid=uuid)
 
         if image is None:
-            image = model.Image(
-                uuid=image_uuid,
-                file_name=None,
-                file_base_path=FILE_BASE_PATH,
-            )
+            image = model.Image(uuid=uuid)
             uow.images.add(image)
 
-        while image_meta_data:
-            meta_data = image_meta_data.pop()
-
-            image.meta_data.add(
-                model.ImageMetaData(
-                    image_uuid=image_uuid,
-                    label=meta_data.get("label"),
-                    x_1=meta_data.get("x_1"),
-                    y_1=meta_data.get("y_1"),
-                    x_2=meta_data.get("x_2"),
-                    y_2=meta_data.get("y_2"),
-                    confidence=meta_data.get("confidence")
-                )
-            )
+        image.add_meta_data(meta_data)
 
         uow.commit()
 
+    logger.info("STORED image meta data in database.")
 
-def log_event(event):
-    logger.info(dataclasses.asdict(event))
+
+def check_if_image_information_is_complete(event, uow, file_saver, rabbitmq_client):
+    uuid = event.uuid
+
+    with uow:
+        image = uow.images.get(uuid=uuid)
+
+        if image is None:
+            return
+
+        if image.file_path is None:
+            return
+
+        if not image.stored:
+            return
+
+        if not image._meta_data:
+            return
+
+        image_file_name = image.file_name
+        meta_data = image.get_meta_data()
+
+    message_as_dict = {
+        "uuid": uuid,
+        "file_name": image_file_name,
+        "timestamp": datetime.datetime.now().isoformat(),
+        "meta_data": meta_data,
+    }
+
+    if not rabbitmq_client.channel.is_open:
+        rabbitmq_client.connect()
+
+    rabbitmq_client.channel.basic_publish(
+        exchange="ImageInformationIsComplete",
+        routing_key="",
+        body=json.dumps(message_as_dict),
+    )
+
+    logger.info("IMAGE INFORMATION IS COMPLETE")
 
 
 COMMAND_HANDLERS = {
     commands.CreateImage: create_image,
     commands.AddMetaDataToImage: add_meta_data_to_image,
-    commands.CreateImageFromStoreEvent: create_image_from_store_event,
+    commands.StoreUploadedImage: store_uploaded_image,
 }
 
 EVENT_HANDLERS = {
-    events.StoredImageOnFileSystem: [log_event],
-    events.StoredImageMetaData: [log_event],
+    events.StoredUploadedImage: [check_if_image_information_is_complete],
+    events.StoredImageMetaData: [check_if_image_information_is_complete],
 }

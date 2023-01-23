@@ -1,6 +1,4 @@
-import json
-from schema import And, Schema, Use
-from dataclasses import dataclass, make_dataclass
+from dataclasses import dataclass
 
 
 class Event:
@@ -8,10 +6,10 @@ class Event:
 
 
 @dataclass
-class StoredImageOnFileSystem(Event):
-    file_path: str
+class StoredUploadedImage(Event):
+    uuid: str
 
 
 @dataclass
 class StoredImageMetaData(Event):
-    pass
+    uuid: str
