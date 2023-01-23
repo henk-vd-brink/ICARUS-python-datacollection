@@ -30,7 +30,7 @@ def store_uploaded_image(cmd, file_saver, rabbitmq_client):
         "meta_data": None,
     }
 
-    if not rabbitmq_client.channel.is_open:
+    if not rabbitmq_client.is_connected():
         rabbitmq_client.connect()
 
     rabbitmq_client.channel.basic_publish(

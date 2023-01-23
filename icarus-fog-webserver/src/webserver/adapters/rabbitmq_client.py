@@ -1,5 +1,4 @@
 import pika
-import time
 import logging
 
 
@@ -21,13 +20,16 @@ class RabbitmqClient:
         self._connection.close()
 
     def connect(self):
-        self._connection = self._connect()
-        self._channel = self._connection.channel()
-
-    def _connect(self):
-        return pika.BlockingConnection(
+        self._connection = pika.BlockingConnection(
             pika.ConnectionParameters(self._config.get("broker_ip_address"))
         )
+        self._channel = self._connection.channel()
+
+    def is_connected(self):
+        if self._connection is None:
+            return False
+
+        return self._connection.is_open
 
     @property
     def channel(self):

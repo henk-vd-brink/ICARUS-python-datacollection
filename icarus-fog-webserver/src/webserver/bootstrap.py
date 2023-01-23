@@ -11,7 +11,6 @@ logging.basicConfig(level=logging.INFO)
 
 def bootstrap(
     start_orm: bool = True,
-    connect_to_rabbitmq_broker: bool = True,
     unit_of_work=uow.SqlAlchemyUnitOfWork(),
     rabbitmq_client=rbc.RabbitmqClient(config=config.get_rabbitmq_config()),
     file_saver=fs.FileSaver(),
@@ -19,9 +18,6 @@ def bootstrap(
 
     if start_orm:
         orm.start_mappers()
-
-    if connect_to_rabbitmq_broker:
-        rabbitmq_client.connect()
 
     dependencies = {
         "uow": unit_of_work,
