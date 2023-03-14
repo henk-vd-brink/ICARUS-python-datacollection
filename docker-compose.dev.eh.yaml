@@ -6,9 +6,10 @@ services:
     container_name: icarus-fog-webserver-eventhub
     entrypoint: [ "./scripts/start.eventhub.sh" ]
     environment:
-      - DB_USER_USERNAME=postgres
-      - DB_USER_PASSWORD=postgres
-      - DB_IP_ADDRESS=icarus-fog-storage
+      - DB_USER_USERNAME=${DB_USER_USERNAME}
+      - DB_USER_PASSWORD=${DB_USER_PASSWORD}
+      - DB_IP_ADDRESS=${DB_IP_ADDRESS}
+      - DB_NAME=${DB_NAME}
       - EVENTHUB_CONNECTION_STRING=${EVENTHUB_CONNECTION_STRING}
       - EVENTHUB_NAME=${EVENTHUB_NAME}
     restart: always
