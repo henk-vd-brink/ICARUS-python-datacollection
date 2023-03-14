@@ -21,3 +21,10 @@ def get_rabbitmq_config():
     return dict(
         broker_ip_address="icarus-fog-rabbitmqbroker",
     )
+
+
+def get_eventhub_config():
+    return dict(
+        eventhub_connection_string=os.environ.get("EVENTHUB_CONNECTION_STRING"),
+        eventhub_name=os.environ.get("EVENTHUB_NAME"),
+    )

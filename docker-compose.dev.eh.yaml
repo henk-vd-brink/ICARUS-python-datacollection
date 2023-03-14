@@ -1,0 +1,36 @@
+version: "3.8"
+
+services:
+  icarus-fog-webserver-eventhub:
+    image: cricarusprod001.azurecr.io/icarus-fog-webserver
+    container_name: icarus-fog-webserver-eventhub
+    entrypoint: [ "./scripts/start.eventhub.sh" ]
+    environment:
+      - DB_USER_USERNAME=postgres
+      - DB_USER_PASSWORD=postgres
+      - DB_IP_ADDRESS=icarus-fog-storage
+      - EVENTHUB_CONNECTION_STRING=${EVENTHUB_CONNECTION_STRING}
+      - EVENTHUB_NAME=${EVENTHUB_NAME}
+    restart: always
+
+  icarus-fog-storage:
+    image: cricarusprod001.azurecr.io/icarus-fog-storage
+    container_name: icarus-fog-storage
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+    restart: always
+
+  # Debug containers
+  pgadmin:
+    image: dpage/pgadmin4
+    ports:
+      - 5555:80
+    environment:
+      PGADMIN_DEFAULT_EMAIL: pgadmin4@pgadmin.org
+      PGADMIN_DEFAULT_PASSWORD: admin
+    restart: always
+
+
+volumes:
+  nginx-uwsgi: null

@@ -35,7 +35,7 @@ images = Table(
 image_meta_data = Table(
     "image_meta_data",
     metadata,
-    Column("id", Integer, primary_key=True, autoincrement=True),
+    Column("hash", Integer, primary_key=True),
     Column("image_uuid", ForeignKey("images.uuid")),
     Column("label", String, nullable=True),
     Column("x_1", Float, nullable=True),

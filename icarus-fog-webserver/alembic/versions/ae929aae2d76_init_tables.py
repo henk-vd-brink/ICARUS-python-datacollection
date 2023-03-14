@@ -29,7 +29,7 @@ def upgrade():
 
     op.create_table(
         "image_meta_data",
-        sa.Column("id", sa.Integer, primary_key=True),
+        sa.Column("hash", sa.String(64), primary_key=True),
         sa.Column("image_uuid", sa.String(100), nullable=False),
         sa.Column("label", sa.String(50), nullable=True),
         sa.Column("x_1", sa.Float, nullable=True),

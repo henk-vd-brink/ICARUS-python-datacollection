@@ -1,3 +1,5 @@
+import hashlib
+import json
 from dataclasses import dataclass, asdict
 import datetime
 import pathlib
@@ -52,6 +54,7 @@ class Image:
 
 @dataclass(unsafe_hash=True)
 class ImageMetaData:
+    hash: str
     label: str
     x_1: float
     y_1: float
@@ -61,7 +64,13 @@ class ImageMetaData:
 
     @classmethod
     def from_dict(cls, input_dict):
+
+        hashed_input_dict = hashlib.sha256(
+            json.dumps(input_dict, sort_keys=True).encode("utf-8")
+        ).hexdigest()
+
         return cls(
+            hash=hashed_input_dict,
             label=input_dict["label"],
             x_1=input_dict["x_1"],
             y_1=input_dict["y_1"],

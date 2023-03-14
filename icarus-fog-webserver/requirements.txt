@@ -1,6 +1,6 @@
 fastapi
 uvicorn
-sqlalchemy
+sqlalchemy==1.4.44
 psycopg2-binary
 alembic
 paho-mqtt
@@ -10,3 +10,5 @@ schema
 pika
 pytest
 gunicorn==20.1.0
+azure-eventhub==5.11.1
+azure-eventhub-checkpointstoreblob-aio==1.1.4
